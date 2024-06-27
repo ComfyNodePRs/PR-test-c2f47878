@@ -29,9 +29,7 @@ class ChessPiecePrompt:
             image_array = np.array(img).astype(np.float32) / 255.0
             # Convert the numpy array to a PyTorch tensor and adjust dimensions
             image_tensor = torch.tensor(image_array).permute(2, 0, 1).unsqueeze(0)
-            # Convert the numpy array to an image
-            image_output = Image.fromarray((image_array * 255).astype(np.uint8))
-            return image_tensor, image_output
+            return image_tensor, image_array
 
     def generate_prompt(self, piece, color):
         color_variable = "red" if color == "black" else "blue"
@@ -43,12 +41,12 @@ class ChessPiecePrompt:
             "Bishop": f"Figurine of a bishop standing. wearing a {color_variable} cloak, holding a staff, metallic sheen, chiselled marble-like texture, high quality, detailed, chess piece, pose matching reference image",
             "Knight": f"Figurine of a knight riding a horse. wearing a {color_variable} helmet, holding a lance, metallic sheen, chiselled marble-like texture, high quality, detailed, chess piece, pose matching reference image",
             "Pawn": f"Figurine of a pawn standing. wearing {color_variable} armour, metallic sheen, chiselled marble-like texture, high quality, detailed, chess piece, pose matching reference image"
-}
+        }
 
         image_folder = "whiteImages" if color == "white" else "blackImages"
-        image_path = os.path.join(os.path.dirname(__file__), image_folder, f"{piece.lower()}_720.png")
-        image_tensor, image_output = self.load_image(image_path)
-        return (prompt_map[piece], image_output)
+        image_path = os.path.join(os.path.dirname(__file__), image_folder, f"{piece.lower()}.png")
+        image_tensor, image_array = self.load_image(image_path)
+        return (prompt_map[piece], image_array)  # Return the numpy array for IPAdapter compatibility
 
 NODE_CLASS_MAPPINGS = {
     "ChessPiecePrompt": ChessPiecePrompt
